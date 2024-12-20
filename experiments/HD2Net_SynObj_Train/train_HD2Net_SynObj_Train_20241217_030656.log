@@ -1,0 +1,932 @@
+2024-12-17 03:06:56,353 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	BasicSR: 1.4.2
+	PyTorch: 2.0.1
+	TorchVision: 0.15.2+cu117
+2024-12-17 03:06:56,353 INFO: 
+  name: HD2Net_SynObj_Train
+  model_type: HD2NetModel
+  scale: 1
+  num_gpu: 1
+  manual_seed: 0
+  datasets:[
+    train:[
+      name: NF3D
+      type: NF3DDataset
+      dataroot_gt: F:\DeAbe\Data\SO_GenNoise_3/train/GT
+      dataroot_lq: F:\DeAbe\Data\SO_GenNoise_3/train/Abe
+      dataroot_nf: F:\DeAbe\Data\SO_GenNoise_3/train/NF
+      meta_info_file: basicsr/data/meta_info/meta_info_SO.txt
+      val_partition: official
+      test_mode: False
+      intensity_threshold: 0.1
+      area_threshold: 0.25
+      io_backend:[
+        type: disk
+      ]
+      num_frame: 64
+      gt_size: 64
+      interval_list: [1]
+      random_reverse: False
+      use_hflip: True
+      use_rot: True
+      num_worker_per_gpu: 6
+      batch_size_per_gpu: 1
+      dataset_enlarge_ratio: 100
+      prefetch_mode: None
+      phase: train
+      scale: 1
+    ]
+    val:[
+      name: SNR3
+      type: PairedImage3DDataset
+      dataroot_gt: F:\DeAbe\Data\SO_Video_Test_tif\tiffile-Abe
+      dataroot_lq: F:\DeAbe\Data\SO_Video_Test_tif\tiffile-Abe
+      cache_data: True
+      io_backend:[
+        type: disk
+      ]
+      num_frame: -1
+      phase: val
+      scale: 1
+    ]
+  ]
+  network_g:[
+    type: HD2Net
+    input_channel: 1
+    num_channels: 32
+    num_blocks: 5
+    num_groups: 5
+    reduction: 8
+    residual_scaling: 1.0
+    num_output_channels: 1
+    return_midlq: True
+  ]
+  path:[
+    pretrain_network_g: None
+    strict_load_g: True
+    resume_state: None
+    experiments_root: F:\DeAbe\EDVR\HD2Net\experiments\HD2Net_SynObj_Train
+    models: F:\DeAbe\EDVR\HD2Net\experiments\HD2Net_SynObj_Train\models
+    training_states: F:\DeAbe\EDVR\HD2Net\experiments\HD2Net_SynObj_Train\training_states
+    log: F:\DeAbe\EDVR\HD2Net\experiments\HD2Net_SynObj_Train
+    visualization: F:\DeAbe\EDVR\HD2Net\experiments\HD2Net_SynObj_Train\visualization
+  ]
+  train:[
+    ema_decay: 0.999
+    optim_g:[
+      type: Adam
+      lr: 0.0001
+      weight_decay: 0
+      betas: [0.9, 0.99]
+    ]
+    scheduler:[
+      type: CosineAnnealingRestartLR
+      periods: [200000]
+      restart_weights: [1]
+      eta_min: 1e-07
+    ]
+    total_iter: 200000
+    warmup_iter: -1
+    fix_flow: 0
+    flow_lr_mul: 0.25
+    pixel_opt:[
+      type: CharbonnierLoss
+      loss_weight: 1
+      reduction: mean
+    ]
+    clean_opt:[
+      type: CharbonnierLoss
+      loss_weight: 1
+      reduction: mean
+    ]
+    midlqloss: False
+    clean_fix: True
+  ]
+  val:[
+    val_freq: 5000.0
+    save_img: True
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 0
+        test_y_channel: False
+      ]
+    ]
+  ]
+  logger:[
+    print_freq: 100
+    save_checkpoint_freq: 5000.0
+    use_tb_logger: True
+    wandb:[
+      project: None
+      resume_id: None
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  find_unused_parameters: True
+  dist: False
+  rank: 0
+  world_size: 1
+  auto_resume: False
+  is_train: True
+  root_path: F:\DeAbe\EDVR\HD2Net
+
+2024-12-17 03:06:57,122 INFO: Temporal augmentation interval list: [1]; random reverse is False.
+2024-12-17 03:06:57,122 INFO: Dataset [NF3DDataset] - NF3D is built.
+2024-12-17 03:06:57,122 INFO: Training statistics:
+	Number of train images: 25600
+	Dataset enlarge ratio: 100
+	Batch size per gpu: 1
+	World size (gpu number): 1
+	Require iter number per epoch: 2560000
+	Total epochs: 1; iters: 200000.
+2024-12-17 03:06:57,123 INFO: Dataset [PairedImage3DDataset] - SNR3 is built.
+2024-12-17 03:06:57,123 INFO: Number of val images/folders in SNR3: 4
+2024-12-17 03:06:57,155 INFO: Network [HD2Net] is created.
+2024-12-17 03:06:57,284 INFO: Network: HD2Net, with parameters: 2,506,402
+2024-12-17 03:06:57,284 INFO: HD2Net(
+  (denoiseBlock): RCAN3D(
+    (conv1): ConvBlock3D(
+      (conv): Conv3d(1, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+    )
+    (residual_groups): Sequential(
+      (0): ResidualGroup3D(
+        (blocks): Sequential(
+          (0): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (1): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (2): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (3): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (4): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+        )
+        (conv): ConvBlock3D(
+          (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        )
+      )
+      (1): ResidualGroup3D(
+        (blocks): Sequential(
+          (0): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (1): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (2): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (3): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (4): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+        )
+        (conv): ConvBlock3D(
+          (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        )
+      )
+      (2): ResidualGroup3D(
+        (blocks): Sequential(
+          (0): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (1): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (2): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (3): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (4): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+        )
+        (conv): ConvBlock3D(
+          (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        )
+      )
+    )
+    (conv2): ConvBlock3D(
+      (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+    )
+    (conv3): ConvBlock3D(
+      (conv): Conv3d(32, 1, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+    )
+  )
+  (deabeBlock): RCAN3D(
+    (conv1): ConvBlock3D(
+      (conv): Conv3d(1, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+    )
+    (residual_groups): Sequential(
+      (0): ResidualGroup3D(
+        (blocks): Sequential(
+          (0): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (1): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (2): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (3): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (4): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+        )
+        (conv): ConvBlock3D(
+          (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        )
+      )
+      (1): ResidualGroup3D(
+        (blocks): Sequential(
+          (0): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (1): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (2): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (3): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (4): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+        )
+        (conv): ConvBlock3D(
+          (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        )
+      )
+      (2): ResidualGroup3D(
+        (blocks): Sequential(
+          (0): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (1): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (2): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (3): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (4): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+        )
+        (conv): ConvBlock3D(
+          (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        )
+      )
+      (3): ResidualGroup3D(
+        (blocks): Sequential(
+          (0): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (1): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (2): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (3): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (4): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+        )
+        (conv): ConvBlock3D(
+          (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        )
+      )
+      (4): ResidualGroup3D(
+        (blocks): Sequential(
+          (0): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (1): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (2): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (3): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+          (4): ResidualChannelAttentionBlock3D(
+            (conv1): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (conv2): ConvBlock3D(
+              (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+            )
+            (channel_attention): ChannelAttentionBlock3D(
+              (global_avg_pool): GlobalAveragePooling3D()
+              (fc1): ConvBlock3D(
+                (conv): Conv3d(32, 4, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+              (fc2): ConvBlock3D(
+                (conv): Conv3d(4, 32, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+              )
+            )
+          )
+        )
+        (conv): ConvBlock3D(
+          (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        )
+      )
+    )
+    (conv2): ConvBlock3D(
+      (conv): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+    )
+    (conv3): ConvBlock3D(
+      (conv): Conv3d(32, 1, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+    )
+  )
+)
+2024-12-17 03:06:57,288 INFO: Use Exponential Moving Average with decay: 0.999
+2024-12-17 03:06:57,317 INFO: Network [HD2Net] is created.
+2024-12-17 03:06:57,849 INFO: Loss [CharbonnierLoss] is created.
+2024-12-17 03:06:57,850 INFO: Loss [CharbonnierLoss] is created.
+2024-12-17 03:06:57,850 INFO: Multiple the learning rate for flow network with 0.25.
+2024-12-17 03:06:57,852 INFO: Model [HD2NetModel] is created.
+2024-12-17 03:07:13,373 INFO: Start training from epoch: 0, iter: 0

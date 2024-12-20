@@ -1,0 +1,47 @@
+name: 0913_test_DoubleRCAN3D_embyro
+model_type: RCAN3DNoiseFreeModel
+scale: 1
+num_gpu: 1  # set num_gpu: 0 for cpu mode
+manual_seed: 0
+
+datasets:
+  test_1:  # the 1st test dataset
+    name: SNR1
+    type: PairedImage3DDataset
+    dataroot_gt: F:\Data\Fig4_Data\Test_NuclearMembrane\Batch3_Pos0\Prepro\BV514_561\SPIMA\Test
+    dataroot_lq: F:\Data\Fig4_Data\Test_NuclearMembrane\Batch3_Pos0\Prepro\BV514_561\SPIMA\Test
+    cache_data: true
+    io_backend:
+      type: disk
+
+    num_frame: -1
+
+# network structures
+network_g:
+  type: DoubleRCAN3D
+  input_channel: 1
+  num_channels: 32
+  num_blocks: 5
+  num_groups: 5
+  reduction: 8
+  residual_scaling: 1.0
+  num_output_channels: 1
+  return_midlq: True
+# path
+path:
+  pretrain_network_g: E:\DeAbe\pth\DoubleRCAN\FIG4\Embyro\net_g_80000.pth
+  strict_load_g: true
+
+# validation settings
+val:
+  input_shape: (64,64,64)
+  overlap_shape: (8,8,8)
+
+  save_img: true
+  suffix: ~  # add suffix to saved images, if None, use exp name
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr_3d
+#    ssim:
+#      type: calculate_ssim_3d
