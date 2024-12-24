@@ -34,8 +34,8 @@ def generate_meta_info_reds():
     """Generate meta info for REDS dataset.
     """
 
-    gt_folder = r'F:\DeAbe\Data\TP_Video_X4\train\GT'
-    meta_info_txt = r'F:\DeAbe\Data\TP_Video_X4\train\GT\meta_info_TP_Video.txt'
+    gt_folder = r''
+    meta_info_txt = r''
 
     with open(meta_info_txt, 'w') as f:
         for i in range(84):
@@ -47,8 +47,8 @@ def generate_meta_info_SO_Video():
     """Generate meta info for SO_Video dataset.
     """
 
-    gt_folder = r'F:\DeAbe\Data\TP_Video_X4\train\GT'
-    meta_info_txt = r'F:\DeAbe\EDVR\BasicSR\basicsr\data\meta_info\meta_info_SO_Video_pic5.txt'
+    gt_folder = r''
+    meta_info_txt = r''
 
     with open(meta_info_txt, 'w') as f:
         for i in range(1000):
@@ -60,8 +60,8 @@ def generate_meta_info_TP_Video():
     """Generate meta info for SO_Video dataset.
     """
 
-    abe_folder = r'E:\DeAbe\Data\TP_Video_840_x1\train\Abe'
-    meta_info_txt = r'E:\DeAbe\BasicSR\basicsr\data\meta_info\meta_info_TP_Video_840.txt'
+    abe_folder = r''
+    meta_info_txt = r''
 
     with open(meta_info_txt, 'w') as f:
         dir_list = os.listdir(abe_folder)
