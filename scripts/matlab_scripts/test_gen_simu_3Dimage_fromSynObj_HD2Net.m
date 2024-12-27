@@ -2,8 +2,8 @@
 % clear all;
 % close all;
 tStart = tic;
-addpath(genpath('..\PhaseDiversity\mFunctions\'));
-addpath(genpath('C:\Users\admin\Downloads\NoiseLevelEstimate\'));
+addpath(genpath('..\mFunc\'));
+
 
 flagGPU = 1;
 objType = 2; % 1: 0.8NA; 2: 1.1NA; 3: 0.71NA; 4: 1.2NA (confocal) 5: 1.0NA (2P)
@@ -71,14 +71,14 @@ amTotalNum = length(amValues);
 noiseHigh = 200;
 noiseLow = 0.1;
 
-fileFolderIn = 'F:\Data\SynObj\';
-fileFolderOut = 'F:\Data\SynObj\Train_NoiseGen200_0p1\';
-fileNameBase = 'img_';
-imgNumStart = 1;
-imgNumEnd = 20;
+fileFolderIn = 'path\input\';
+fileFolderOut = 'path\output\';
+fileNameBase = '';
+imgNumStart = 0;
+imgNumEnd = 9;
 imgNumOutBase = 0; % modify for each pos folder
 
-imgNumVali = 16;
+imgNumVali = 5;
 imgNumValiInterval = 10;
 
 % output folders
@@ -91,6 +91,7 @@ fileFolderOutPSF = [fileFolderOut, 'PSF\'];
 
 fileFolderOutVali = [fileFolderOut, 'Validation\'];
 fileFolderOutValiInput = [fileFolderOutVali, 'GT\'];
+fileFolderOutValiNF = [fileFolderOutVali, 'NF\'];
 fileFolderOutValiAbe = [fileFolderOutVali, 'Aberrated\'];
 % fileFolderOutValiInputMP = [fileFolderOutVali, 'GT_ZProj\'];
 fileFolderOutValiAbeMP = [fileFolderOutVali, 'Aberrated_ZProj\'];
@@ -108,8 +109,9 @@ mkdir(fileFolderOutAbe);
 % mkdir(fileFolderOutAbeMP);
 mkdir(fileFolderOutPSF);
 
-mkdir(fileFolderOutVali);
+mkdir(fileFolderOutValiInput);
 mkdir(fileFolderOutValiAbe);
+mkdir(fileFolderOutValiNF);
 % mkdir(fileFolderOutValiInput);
 % mkdir(fileFolderOutValiAbeMP);
 % mkdir(fileFolderOutValiInputMP);
@@ -162,6 +164,18 @@ for i = imgNumStart:imgNumEnd
             if(flagSavePSFtrigger==1)
                 WriteTifStack(PSF_aberrated,[fileFolderOutPSF, 'PSF_aberrated_', num2str(iOut), '_', num2str(j), '_Am', num2str(k), '.tif'],16);
             end
+
+
+        if(mod(i,imgNumValiInterval) == imgNumVali) % pick images for validation
+            iNoise = rand*(noiseHigh-noiseLow) + noiseLow;
+            WriteTifStack(imgGT,[fileFolderOutValiInput, fileNameBase, num2str(iOut),'_', num2str(j), '_Am', num2str(k), '_Noise', num2str(iNoise), '.tif'],16);
+            WriteTifStack(imgAbe,[fileFolderOutValiNF, fileNameBase, num2str(iOut),'_', num2str(j), '_Am', num2str(k), '_Noise', num2str(iNoise), '.tif'],16);
+            imgAbeNoise = iNoise * imgAbe;
+            for iz = 1:Sz
+                imgAbeNoise(:,:,iz) = addpoissonnoise(imgAbeNoise(:,:,iz));
+            end
+            WriteTifStack(imgAbeNoise,[fileFolderOutValiAbe, fileNameBase, num2str(iOut),'_', num2str(j), '_Am', num2str(k), '_Noise', num2str(iNoise), '.tif'],16);
+        else
             iNoise = rand*(noiseHigh-noiseLow) + noiseLow;
             WriteTifStack(imgGT,[fileFolderOutInput, fileNameBase, num2str(iOut),'_', num2str(j), '_Am', num2str(k), '_Noise', num2str(iNoise), '.tif'],16);
             WriteTifStack(imgAbe,[fileFolderOutNF, fileNameBase, num2str(iOut),'_', num2str(j), '_Am', num2str(k), '_Noise', num2str(iNoise), '.tif'],16);
@@ -171,7 +185,7 @@ for i = imgNumStart:imgNumEnd
             end
             WriteTifStack(imgAbeNoise,[fileFolderOutAbe, fileNameBase, num2str(iOut),'_', num2str(j), '_Am', num2str(k), '_Noise', num2str(iNoise), '.tif'],16);
         end
-        
+        end
     end
     if(flagSavePSF==0) % turn off trigger next time point
         flagSavePSFtrigger = 0;

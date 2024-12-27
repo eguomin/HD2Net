@@ -10,9 +10,9 @@ datasets:
   train:
     name: NF3D
     type: NF3DDataset
-    dataroot_gt: path/train/input/train/GT
-    dataroot_lq: path/train/input/train/Abe
-    dataroot_nf: path/train/input/train/NF
+    dataroot_gt: path\data/train/GT
+    dataroot_lq: path\data/train/Abe
+    dataroot_nf: path\data/train/NF
     meta_info_file: basicsr/data/meta_info/meta_info_SO.txt
     val_partition: 'official'  # not needed
     test_mode: False
@@ -37,8 +37,8 @@ datasets:
   val:
     name: SNR3
     type: PairedImage3DDataset
-    dataroot_gt: path/train/input/GT
-    dataroot_lq: path/train/input/Abe
+    dataroot_gt: path\data\test/GT
+    dataroot_lq: path\data\test/Abe
     cache_data: true
     io_backend:
       type: disk

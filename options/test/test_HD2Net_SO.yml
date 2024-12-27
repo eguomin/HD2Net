@@ -8,8 +8,8 @@ datasets:
   test_1:  # the 1st test dataset
     name: SNR1
     type: PairedImage3DDataset
-    dataroot_gt: path/train/input/GT
-    dataroot_lq: path/train/input/Abe
+    dataroot_gt: path/test/GT
+    dataroot_lq: path/test/Abe
     cache_data: true
     io_backend:
       type: disk
@@ -29,7 +29,7 @@ network_g:
   return_midlq: True
 # path
 path:
-  pretrain_network_g: E:\DeAbe\pth\DoubleRCAN\FIG4\Embyro\net_g_80000.pth
+  pretrain_network_g: path/net_g_80000.pth
   strict_load_g: true
 
 # validation settings

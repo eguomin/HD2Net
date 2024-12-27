@@ -8,16 +8,16 @@ import shutil
 
 
 input_path_list = [
-    "path\input\Aberrated",
-                   "path\input\GT",
-                   r"path\input\Noise_Free",
-                   "path\input\Validation\Aberrated",
-                   "path\input\Validation\GT",
-                    r"path\input\Validation\Noise_Free",
+                   r"path\input\Aberrated",
+                   r"path\input\GT",
+                   r"path\input\NF",
+                   r"path\input\Validation\Aberrated",
+                   r"path\input\Validation\GT",
+                    r"path\input\Validation\NF",
                    ]
 
 out_path_list = [
-    r'path\output\train\Abe',
+                 r'path\output\train\Abe',
                  r'path\output\train\GT',
                  r'path\output\train\NF',
                  r'path\output\val\Abe',
@@ -56,7 +56,7 @@ def pad_xy(img_x,img_y):
 
 
 with open(meta_info_txt, 'w') as f:
-    for j in range(len(input_path_list)):
+    for j in range(3):
         inpath = input_path_list[j]
         out_path = out_path_list[j]
         img_list = os.listdir(inpath)
@@ -80,4 +80,11 @@ with open(meta_info_txt, 'w') as f:
                 tifffile.imwrite(out_img_path, img_out)
             if j==0:
                 info = f'{tif_name}' + f' %d' % img_pick.shape[0] + f' ({img_pick.shape[1]},{img_pick.shape[2]},{1})'
-                f.write(f'{info}\n')
+                if i == len(img_list) - 1:
+                    f.write(f'{info}')
+                else:
+                    f.write(f'{info}\n')
+    for j in range(3):
+        inpath = input_path_list[j+3]
+        out_path = out_path_list[j+3]
+        shutil.copytree(inpath, out_path)
