@@ -97,6 +97,9 @@ train:
 
 # validation settings
 val:
+  input_shape: (64,64,64)
+  overlap_shape: (8,8,8)
+  
   val_freq: !!float 5e3
   save_img: true
 
